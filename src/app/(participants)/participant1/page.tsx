@@ -5,7 +5,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-interface TestCase {
+export interface TestCase {
   id: number;
   input: string;
   output: string;
@@ -133,15 +133,18 @@ const Participant1 = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-y-10 w-fit h-fit mx-10">
-      <div className="relative top-0 rounded-2xl text-white text-[7rem] font-bold bg-black px-7 py-0 border-2 border-purple-500">
+    <div className="relative min-h-screen flex flex-col items-center justify-center gap-y-10 w-fit h-fit mx-10">
+      <div className="absolute left-0 top-0 rounded-2xl text-white text-[5rem] font-bold bg-black px-7 py-0 border-2 border-purple-500">
         {formatTime(timeLeft)}
       </div>
-      <div className="mb-16 flex flex-col items-center justify-center w-full h-max gap-y-10">
+      <div className="text-white text-[5.5rem] absolute top-0 right-0">
+        Question ID:{question?.id}
+      </div>
+      <div className="-mt-20 mb-16 flex flex-col items-center justify-center w-full h-max gap-y-10">
         {question && (
           <>
             <div className="p-1 relative break-words w-[92.5vw] h-fit bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg">
-              <div className="flex items-center justify-left bg-black w-full p-4 h-full rounded-lg text-[1.1rem] px-5">
+              <div className="flex items-center justify-left bg-black w-full p-4 h-full rounded-lg text-[1.3rem] px-5">
                 {question.question}
               </div>
             </div>
@@ -168,7 +171,7 @@ const Participant1 = () => {
               disabled
               className="relative w-fit h-20 p-1 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500 group"
             >
-              <div className="flex items-center justify-center w-full h-full px-6 py-4 text-3xl text-white bg-black rounded-lg transition-all duration-500 group-hover:shadow-lg group-hover:shadow-[#4b52f2] group-hover:bg-transparent group-hover:text-[2rem]">
+              <div className="flex items-center justify-center w-full h-full px-6 py-4 text-[1.6rem] text-white bg-black rounded-lg transition-all duration-500 group-hover:shadow-lg group-hover:shadow-[#4b52f2] group-hover:bg-transparent group-hover:text-[2rem]">
                 Hidden test cases viewed
               </div>
             </Button>
@@ -177,7 +180,7 @@ const Participant1 = () => {
               onClick={handleClick}
               className="relative w-fit h-20 p-1 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500 group"
             >
-              <div className="flex items-center justify-center w-full h-full px-6 py-4 text-3xl text-white bg-black rounded-lg transition-all duration-500 group-hover:shadow-lg group-hover:shadow-[#4b52f2] group-hover:bg-transparent group-hover:text-[2rem]">
+              <div className="flex items-center justify-center w-full h-full px-6 py-4 text-[1.6rem] text-white bg-black rounded-lg transition-all duration-500 group-hover:shadow-lg group-hover:shadow-[#4b52f2] group-hover:bg-transparent group-hover:text-[1.8rem]">
                 View hidden test cases?
               </div>
             </Button>
