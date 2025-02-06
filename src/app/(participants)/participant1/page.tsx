@@ -99,9 +99,7 @@ const Participant1 = () => {
       const questions = response.data;
       let selectedQuestionId = localStorage.getItem("questionid");
       if (!selectedQuestionId) {
-        selectedQuestionId = (
-          Math.floor(Math.random() * questions.length) + 1
-        ).toString();
+        selectedQuestionId = (Math.floor(Math.random() * 5) + 1).toString();
         localStorage.setItem("questionid", selectedQuestionId);
       }
 
@@ -128,7 +126,11 @@ const Participant1 = () => {
   };
 
   const handleClick = () => {
-    if (confirm("Are you sure you want to view hidden test cases?")) {
+    if (
+      confirm(
+        "Are you sure? 750 points will be deducted from your team's final score."
+      )
+    ) {
       setViewHiddenTestCases(true);
       localStorage.setItem("viewedHidden", "true");
     } else {
