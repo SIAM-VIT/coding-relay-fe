@@ -77,15 +77,7 @@ const Participant1 = () => {
     checkEventStatus();
 
     const interval = setInterval(() => {
-      setTimeLeft((prevTime) => {
-        if (prevTime <= 1) {
-          clearInterval(interval);
-          localStorage.setItem("end", "true");
-          router.replace("/end");
-          return 0;
-        }
-        return prevTime - 1;
-      });
+      checkEventStatus();
     }, 1000);
 
     return () => clearInterval(interval);
