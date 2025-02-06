@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export interface TestCase {
@@ -19,11 +19,24 @@ interface Question {
 
 const Participant1 = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const [timeLeft, setTimeLeft] = useState(3600);
   const [viewHiddenTestCases, setViewHiddenTestCases] = useState(false);
   const [question, setQuestion] = useState<Question | null>(null);
 
-  // Fetching event status and updating time left
+  useEffect(() => {
+    if (!localStorage.getItem("participantid")) {
+      localStorage.setItem("participantid", "1");
+    }
+    const storedParticipantId = localStorage.getItem("participantid");
+    const currentParticipantId = pathname.replace("/participant", "");
+
+    if (storedParticipantId !== currentParticipantId) {
+      router.replace(`/participant${storedParticipantId}`);
+      return;
+    }
+  }, [pathname, router]);
+
   useEffect(() => {
     const hiddenTestCasesViewed =
       localStorage.getItem("viewedHidden") === "true";
@@ -36,14 +49,13 @@ const Participant1 = () => {
       }
 
       try {
-        // Fetching the timer status
         const response = await axios.get(
           "https://coding-relay-be.onrender.com/leaderboard/getTimer"
         );
 
         const { start_time } = response.data;
         const eventStartTime = new Date(start_time).getTime();
-        const eventEndTime = eventStartTime + 1 * 60 * 60 * 1000; // 1 hour
+        const eventEndTime = eventStartTime + 1 * 60 * 60 * 1000;
         const currentTime = new Date().getTime();
 
         const remainingTime = Math.max(
@@ -64,7 +76,6 @@ const Participant1 = () => {
 
     checkEventStatus();
 
-    // Polling timer update every second
     const interval = setInterval(() => {
       setTimeLeft((prevTime) => {
         if (prevTime <= 1) {
@@ -80,26 +91,20 @@ const Participant1 = () => {
     return () => clearInterval(interval);
   }, [router]);
 
-  // Fetching the questions based on difficulty level
   const fetchQuestions = async () => {
     try {
       const response = await axios.get(
         "https://coding-relay-be.onrender.com/questions/getQuestionsByDifficulty?difficulty=easy"
       );
       const questions = response.data;
-
-      // Check if questionid exists in localStorage
       let selectedQuestionId = localStorage.getItem("questionid");
-
       if (!selectedQuestionId) {
-        // If no questionid in localStorage, pick a random question
         selectedQuestionId = (
           Math.floor(Math.random() * questions.length) + 1
         ).toString();
         localStorage.setItem("questionid", selectedQuestionId);
       }
 
-      // Find the question with the selected ID
       const selectedQuestion = questions.find(
         (question: Question) => question.id === parseInt(selectedQuestionId)
       );
@@ -110,7 +115,6 @@ const Participant1 = () => {
     }
   };
 
-  // Trigger fetch when component mounts
   useEffect(() => {
     fetchQuestions();
   }, []);
@@ -133,14 +137,14 @@ const Participant1 = () => {
   };
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center gap-y-10 w-fit h-fit mx-10">
+    <div className="relative min-h-screen flex flex-col items-center justify-center w-fit mx-10">
       <div className="absolute left-0 top-0 rounded-2xl text-white text-[5rem] font-bold bg-black px-7 py-0 border-2 border-purple-500">
         {formatTime(timeLeft)}
       </div>
       <div className="text-white text-[5.5rem] absolute top-0 right-0">
         Question ID:{question?.id}
       </div>
-      <div className="-mt-20 mb-16 flex flex-col items-center justify-center w-full h-max gap-y-10">
+      <div className="relative top-20 my-16 flex flex-col items-center justify-center w-full h-max gap-y-5">
         {question && (
           <>
             <div className="p-1 relative break-words w-[92.5vw] h-fit bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg">
@@ -148,12 +152,11 @@ const Participant1 = () => {
                 {question.question}
               </div>
             </div>
-
-            <div className="w-full h-max flex items-center justify-start gap-x-5">
-              {question.testCaseId.map((testCase: TestCase) => (
+            <div className="w-full h-max flex flex-col items-center justify-center gap-y-5">
+              {question?.testCaseId.slice(0, 3).map((testCase: TestCase) => (
                 <div
                   key={testCase.id}
-                  className="relative p-1 text-xl break-words w-1/3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg"
+                  className="relative p-1 text-xl break-words w-full h-fit bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg"
                 >
                   <div className="flex gap-y-2 flex-col items-start justify-center bg-black w-full h-full p-4 rounded-lg text-xl px-5">
                     <span>Input: {testCase.input}</span>
@@ -165,17 +168,7 @@ const Participant1 = () => {
           </>
         )}
         <div>
-          {viewHiddenTestCases ? (
-            <Button
-              onClick={handleClick}
-              disabled
-              className="relative w-fit h-20 p-1 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500 group"
-            >
-              <div className="flex items-center justify-center w-full h-full px-6 py-4 text-[1.6rem] text-white bg-black rounded-lg transition-all duration-500 group-hover:shadow-lg group-hover:shadow-[#4b52f2] group-hover:bg-transparent group-hover:text-[2rem]">
-                Hidden test cases viewed
-              </div>
-            </Button>
-          ) : (
+          {!viewHiddenTestCases && (
             <Button
               onClick={handleClick}
               className="relative w-fit h-20 p-1 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500 group"
@@ -186,6 +179,18 @@ const Participant1 = () => {
             </Button>
           )}
         </div>
+        {viewHiddenTestCases &&
+          question?.testCaseId.slice(3).map((testCase: TestCase) => (
+            <div
+              key={testCase.id}
+              className="relative p-1 text-xl break-words w-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg"
+            >
+              <div className="flex gap-y-2 flex-col items-start justify-center bg-black w-full h-full p-4 rounded-lg text-xl px-5">
+                <span>Input: {testCase.input}</span>
+                <span>Output: {testCase.output}</span>
+              </div>
+            </div>
+          ))}
       </div>
     </div>
   );

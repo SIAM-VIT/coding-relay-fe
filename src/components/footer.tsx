@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const Footer2 = () => {
   return (
-    <div className="relative bottom-2 mb-2 text-center flex flex-col w-full items-center justify-center gap-y-2">
+    <div className="relative my-7 text-center flex flex-col w-full items-center justify-center gap-y-2">
       <p className="text-base">&copy; 2025 SIAM-VIT. All rights reserved.</p>
       <div className="flex flex-row items-center justify-center gap-x-4 w-fit">
         <Link

@@ -32,8 +32,7 @@ export default function Home() {
       );
       router.push(`/participant${id}`);
     } catch (error) {
-      const err = error as AxiosError;
-      if (err.response && err.response.status === 400) {
+      if (error instanceof AxiosError && error.response?.status === 400) {
         toast.error("Event has not started yet");
       } else {
         toast.error("An unexpected error occurred");
